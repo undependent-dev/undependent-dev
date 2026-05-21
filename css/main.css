@@ -314,3 +314,10 @@ footer { padding: 80px 0 32px; border-top: 1px solid var(--border); }
   .hero { padding: 140px 0 80px; }
   .features, .how, .scan-section, .pricing, .compare, .cta-section { padding: 80px 0; }
 }
+
+/* CONTACT SECTION */
+.contact-section { padding: 120px 0; }
+.contact-section textarea:focus { outline: none; border-color: var(--accent); }
+#contact-result { margin-top: 16px; padding: 16px; border-radius: 8px; display: none; font-size: 14px; line-height: 1.5; }
+#contact-result.success { display: block; background: var(--accent-subtle); border: 1px solid var(--accent-border); color: var(--accent); }
+#contact-result.error { display: block; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--red); }

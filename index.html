@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Undependent — Be Undependent. Own Your Code.</title>
   <meta name="description" content="Eliminate supply chain risk by absorbing third-party dependencies into your codebase."/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⊡</text></svg>"/>
   <link rel="stylesheet" href="css/main.css"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -61,30 +62,6 @@
         <span class="logo-item">left-pad</span>
         <span class="logo-item">dependency confusion</span>
         <span class="logo-item">typosquatting</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="social-proof">
-    <div class="container">
-      <p class="social-proof-label">Trusted by engineering teams shipping secure code</p>
-      <div class="social-proof-grid">
-        <div class="proof-stat">
-          <div class="proof-number" data-count="847">0</div>
-          <div class="proof-label">Repos Scanned</div>
-        </div>
-        <div class="proof-stat">
-          <div class="proof-number" data-count="12453">0</div>
-          <div class="proof-label">Vulnerabilities Found</div>
-        </div>
-        <div class="proof-stat">
-          <div class="proof-number" data-count="342">0</div>
-          <div class="proof-label">Reports Delivered</div>
-        </div>
-        <div class="proof-stat">
-          <div class="proof-number" data-count="99">0</div>
-          <div class="proof-label">% Uptime</div>
-        </div>
       </div>
     </div>
   </section>
@@ -201,7 +178,7 @@
             <li><span class="check">&#x2713;</span> CVE scanning</li>
             <li><span class="check">&#x2713;</span> Community support</li>
           </ul>
-          <a href="https://github.com/undependent-dev/undependent" target="_blank" class="btn btn-block btn-ghost">Get Started</a>
+          <a href="https://github.com/undependent-dev/undependent/releases/latest" target="_blank" class="btn btn-block btn-ghost">Download Free</a>
         </div>
         <!-- 2. SINGLE SCAN ($99) -->
         <div class="price-card">
@@ -215,10 +192,11 @@
             <li><span class="check">&#x2713;</span> Delivered in 24 hours</li>
             <li><span class="check">&#x2713;</span> No subscription required</li>
           </ul>
-          <button class="btn btn-block btn-ghost">Scan a Repo</button>
+          <a href="#" class="btn btn-block btn-ghost" id="btn-scan" onclick="handlePayment('scan');return false;">Scan a Repo — $99</a>
         </div>
         <!-- 3. COMMERCIAL ($299/yr) -->
         <div class="price-card featured">
+          <div class="badge">Most Popular</div>
           <h3>Commercial</h3>
           <div class="price">$299<span style="font-size:16px;color:var(--text-muted);font-weight:500">/yr</span></div>
           <p class="price-desc">Same CLI, commercial license. No AGPL viral terms. Use internally without open-sourcing.</p>
@@ -229,10 +207,10 @@
             <li><span class="check">&#x2713;</span> Priority bug fixes</li>
             <li><span class="check">&#x2713;</span> Unlimited users &amp; repos</li>
           </ul>
-          <button class="btn btn-block btn-accent">Get License</button>
+          <a href="#" class="btn btn-block btn-accent" id="btn-license" onclick="handlePayment('license');return false;">Get License — $299/yr</a>
         </div>
       </div>
-      <!-- ADD-ONS ROW (no prices, build appetite) -->
+      <!-- ADD-ONS ROW -->
       <div class="addons-section">
         <h3 style="text-align:center;font-size:18px;color:var(--text);margin-bottom:28px;font-weight:600;">Additional Services</h3>
         <div class="addons-row">
@@ -253,7 +231,7 @@
             <span class="addon-label">Air-Gapped Solutions</span>
           </a>
         </div>
-        <p class="addons-subtext">Custom pricing based on your needs. <a href="mailto:sales@undependent.dev" style="color:var(--accent);text-decoration:none;">Talk to us</a>.</p>
+        <p class="addons-subtext">Custom pricing based on your needs. <a href="#contact" style="color:var(--accent);text-decoration:none;">Talk to us</a>.</p>
       </div>
       <div class="pricing-note">
         <p><strong>Your code, your rules.</strong> Absorb dependencies into your codebase. Eliminate supply chain risk at the source — not just detect it. Start free, upgrade when your company needs to.</p>
@@ -341,6 +319,24 @@
     </div>
   </section>
 
+  <section id="contact" class="contact-section">
+    <div class="container">
+      <div class="scan-box">
+        <h2>Need Something Custom?</h2>
+        <p>Enterprise licensing, on-prem deployment, dedicated support, or custom integrations. We'll work with you.</p>
+        <form id="contact-form">
+          <input type="text" id="contact-name" placeholder="Your name" required/>
+          <input type="email" id="contact-email" placeholder="your@email.com" required/>
+          <input type="text" id="contact-company" placeholder="Company (optional)"/>
+          <textarea id="contact-message" placeholder="Tell us what you need..." rows="4" required style="width:100%;padding:14px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:15px;margin-bottom:12px;font-family:var(--font);resize:vertical;transition:border-color 0.2s;"></textarea>
+          <button type="submit" class="btn btn-lg">Send Message</button>
+        </form>
+        <div id="contact-result"></div>
+        <p style="margin-top:20px;font-size:12px;color:var(--text-dim);">Or email us directly at <a href="mailto:sales@undependent.dev" style="color:var(--accent);text-decoration:none;">sales@undependent.dev</a></p>
+      </div>
+    </div>
+  </section>
+
   <section class="cta-section">
     <div class="container">
       <h2>Ready to be Undependent?</h2>
@@ -371,21 +367,21 @@
         <a href="#features">Features</a>
         <a href="#pricing">Pricing</a>
         <a href="#compare">Compare</a>
-        <a href="https://github.com/undependent-dev/undependent">GitHub</a>
+        <a href="https://github.com/undependent-dev/undependent" target="_blank">GitHub</a>
       </div>
       <div class="footer-col">
         <h4>Resources</h4>
-        <a href="#">Documentation</a>
-        <a href="#">API Reference</a>
-        <a href="#">Changelog</a>
-        <a href="#">Security Policy</a>
+        <a href="https://github.com/undependent-dev/undependent#readme" target="_blank">Documentation</a>
+        <a href="https://github.com/undependent-dev/undependent/blob/main/CHANGELOG.md" target="_blank">Changelog</a>
+        <a href="https://github.com/undependent-dev/undependent/blob/main/SECURITY.md" target="_blank">Security Policy</a>
+        <a href="https://github.com/undependent-dev/undependent/releases" target="_blank">Releases</a>
       </div>
       <div class="footer-col">
         <h4>Legal</h4>
-        <a href="#">AGPL v3 License</a>
-        <a href="#">Commercial License</a>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
+        <a href="https://github.com/undependent-dev/undependent/blob/main/LICENSE" target="_blank">AGPL v3 License</a>
+        <a href="#pricing">Commercial License</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
       </div>
     </div>
     <div class="container footer-bottom">

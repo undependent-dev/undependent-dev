@@ -1,5 +1,27 @@
 // Undependent — Main JavaScript
 
+// ── Stripe Payment Links ──
+// These are configured by the admin in Stripe Dashboard → Payment Links
+// Update these URLs when you create the payment links in Stripe
+const STRIPE_LINKS = {
+  scan:    'https://buy.stripe.com/test_',     // Single Scan — $99
+  license: 'https://buy.stripe.com/test_',     // Commercial License — $299/yr
+};
+
+function handlePayment(type) {
+  const url = STRIPE_LINKS[type];
+  if (url && !url.includes('test_')) {
+    window.open(url, '_blank');
+  } else {
+    // Fallback: show message when Stripe links aren't configured yet
+    const messages = {
+      scan: 'Payment setup in progress. Email sales@undependent.dev for immediate access.',
+      license: 'Payment setup in progress. Email sales@undependent.dev for immediate access.',
+    };
+    alert(messages[type] || 'Coming soon.');
+  }
+}
+
 // ── Hero Terminal Typewriter ──
 const heroTerminalLines = [
   { type: 'prompt', text: '$ undep analyze' },
@@ -113,7 +135,6 @@ function initParticleGrid() {
   function draw() {
     ctx.clearRect(0, 0, w, h);
 
-    // Draw connections
     for (let i = 0; i < particles.length; i++) {
       for (let j = i + 1; j < particles.length; j++) {
         const dx = particles[i].x - particles[j].x;
@@ -131,9 +152,7 @@ function initParticleGrid() {
       }
     }
 
-    // Draw particles + mouse interaction
     for (const p of particles) {
-      // Mouse repulsion
       const mdx = p.x - mouseX;
       const mdy = p.y - mouseY;
       const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
@@ -143,11 +162,9 @@ function initParticleGrid() {
         p.vy += (mdy / mDist) * force;
       }
 
-      // Gentle damping — keep particles moving
       p.vx *= 0.998;
       p.vy *= 0.998;
 
-      // Speed limit
       const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
       if (speed > 4.0) {
         p.vx = (p.vx / speed) * 4.0;
@@ -157,13 +174,11 @@ function initParticleGrid() {
       p.x += p.vx;
       p.y += p.vy;
 
-      // Wrap
       if (p.x < 0) p.x = w;
       if (p.x > w) p.x = 0;
       if (p.y < 0) p.y = h;
       if (p.y > h) p.y = 0;
 
-      // Draw
       const mouseGlow = mDist < 150 ? (1 - mDist / 150) * 0.5 : 0;
       const alpha = 0.15 + mouseGlow;
       ctx.fillStyle = `rgba(74,222,128,${alpha})`;
@@ -181,7 +196,6 @@ function initParticleGrid() {
 
   window.addEventListener('resize', () => { resize(); createParticles(); });
 
-  // Track mouse over entire page
   document.addEventListener('mousemove', e => {
     mouseX = e.clientX;
     mouseY = e.clientY;
@@ -196,38 +210,35 @@ function initParticleGrid() {
 function initScrollFade() {
   const canvas = document.getElementById('particle-canvas');
   if (!canvas) return;
-  // Canvas is fixed — keep it visible throughout the page
-  // Slightly reduce opacity as user scrolls away from top
   window.addEventListener('scroll', () => {
     const scrollY = window.scrollY;
     const vh = window.innerHeight;
-    // Fade from 1.0 at top to 0.6 at 4 viewport heights down — stays visible throughout
     const opacity = Math.max(0.6, 1 - scrollY / (vh * 4));
     canvas.style.opacity = opacity;
   }, { passive: true });
 }
 
-// ── Smooth Scroll Offset ──
+// ── Init ──
 document.addEventListener('DOMContentLoaded', () => {
   // Hero terminal
   const heroOutput = document.getElementById('terminal-output');
   const heroTypewriter = createTypewriter(heroTerminalLines, heroOutput);
   setTimeout(() => heroTypewriter.start(), 500);
 
-  // Reset button for hero terminal
   const resetBtn = document.getElementById('reset-terminal');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => heroTypewriter.reset());
   }
 
-  // Particle grid background
   initParticleGrid();
   initScrollFade();
 
   // Smooth scroll with offset for fixed nav
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
-      const target = document.querySelector(a.getAttribute('href'));
+      const href = a.getAttribute('href');
+      if (href === '#') return;
+      const target = document.querySelector(href);
       if (target) {
         e.preventDefault();
         const offset = 80;
@@ -278,6 +289,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (form) {
     form.addEventListener('submit', handleScan);
   }
+
+  // Contact form
+  const contactForm = document.getElementById('contact-form');
+  if (contactForm) {
+    contactForm.addEventListener('submit', handleContact);
+  }
 });
 
 function animateCounter(el, target) {
@@ -293,6 +310,7 @@ function animateCounter(el, target) {
   }, 25);
 }
 
+// ── Scan Form Handler ──
 async function handleScan(e) {
   e.preventDefault();
   const repo = document.getElementById('repo-url').value;
@@ -304,7 +322,8 @@ async function handleScan(e) {
   result.textContent = 'Scanning...';
 
   try {
-    const res = await fetch('/api/scan', {
+    // Try the deployed API first, fall back gracefully
+    const res = await fetch('https://undependent.dev/api/scan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ repo_url: repo, email }),
@@ -312,13 +331,50 @@ async function handleScan(e) {
     const data = await res.json();
     if (res.ok) {
       result.className = 'success';
-      result.innerHTML = `✓ Scan queued! Check your email for results.`;
+      result.innerHTML = '✓ Scan queued! Check your email for results.';
     } else {
       result.className = 'error';
       result.textContent = data.error || 'Scan failed. Please try again.';
     }
   } catch (err) {
+    // Backend not deployed yet — show helpful fallback
     result.className = 'error';
-    result.textContent = 'Server unavailable. Try again in a moment.';
+    result.innerHTML = 'Our scan server is coming online soon. <a href="#contact" style="color:var(--accent);">Contact us</a> for immediate access, or <a href="https://github.com/undependent-dev/undependent/releases/latest" target="_blank" style="color:var(--accent);">download the CLI</a> to scan locally for free.';
+  }
+}
+
+// ── Contact Form Handler ──
+async function handleContact(e) {
+  e.preventDefault();
+  const name = document.getElementById('contact-name').value;
+  const email = document.getElementById('contact-email').value;
+  const company = document.getElementById('contact-company').value;
+  const message = document.getElementById('contact-message').value;
+  const result = document.getElementById('contact-result');
+
+  result.style.display = 'block';
+  result.className = '';
+  result.textContent = 'Sending...';
+
+  try {
+    const res = await fetch('https://undependent.dev/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, company, message }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      result.className = 'success';
+      result.textContent = '✓ Message sent! We\'ll respond within 24 hours.';
+      e.target.reset();
+    } else {
+      throw new Error(data.error || 'Failed to send');
+    }
+  } catch (err) {
+    // Fallback: open mailto
+    result.className = 'error';
+    const subject = encodeURIComponent(`Undependent Inquiry from ${name}${company ? ' (' + company + ')' : ''}`);
+    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}${company ? '\nCompany: ' + company : ''}\n\n${message}`);
+    result.innerHTML = `Our contact server is coming online soon. <a href="mailto:sales@undependent.dev?subject=${subject}&body=${body}" style="color:var(--accent);">Email us directly</a> instead.`;
   }
 }
